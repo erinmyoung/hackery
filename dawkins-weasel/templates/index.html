@@ -1,5 +1,23 @@
-<form method="POST">
-  <label>Add a target string</label>
-  <input name="target">
-  <input type="submit">
-</form>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Methinks it is a Weasel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  </head>
+  <body>
+    <div class="page_content">
+      <form method="POST">
+        <label>Add a target string</label>
+        <input name="target">
+        <input type="submit">
+      </form>
+
+      {% if output %}
+        <div class="output_wrapper">
+          {{ output|safe }}
+          <p>Index: {{ index }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </body>
+</html>

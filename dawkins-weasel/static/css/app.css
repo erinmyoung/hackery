@@ -1,0 +1,23 @@
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: black;
+  height: 100vh;
+}
+
+.page_content {
+  display: grid;
+  margin: auto;
+  row-gap: 20px;
+  padding: 20px;
+}
+
+form {
+  min-width: 300px;
+  display: grid;
+  row-gap: 10px;
+}

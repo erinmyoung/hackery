@@ -66,7 +66,7 @@ def match_target(target, target_score):
         new_chars = strings[scores.index(high_score)]
         mutated_target.append(new_chars)
         loop_index += 1
-    return '<br>'.join(mutated_target)
+    return render_template('index.html', output='<br>'.join(mutated_target), index=loop_index)
 
 if __name__ == '__main__':
   app.run(debug=True)
