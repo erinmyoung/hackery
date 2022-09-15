@@ -1,12 +1,16 @@
-import random
-import string
 from flask import Flask, request, render_template
 
+import random
+import string
+
+
 app = Flask(__name__)
+
 
 @app.route("/")
 def index():
     return render_template('index.html')
+
 
 @app.route('/', methods=['POST'])
 def index_post():
@@ -14,16 +18,20 @@ def index_post():
     target_score = len(target)
     return match_target(target, target_score)
 
+
 def get_random():
     return random.choice(string.ascii_uppercase + ' ')
+
 
 # 1. Start with a random string of characters the same length as the target
 def get_chars(random_choices, target_score):
     return ''.join(random_choices for _ in range(target_score))
 
+
 # 2. Make 100 copies of the string (reproduce)
 def reproduce(chars):
     return [chars] * 100
+
 
 # 3. For each character in each of the 100 copies, with a probability of 5%, replace (mutate) the character with a new random character.
 def mutate(chars):
@@ -35,6 +43,7 @@ def mutate(chars):
             new_char += c
     return new_char
 
+
 # 4. Compare each new string with the target string, and give each a score (the number of letters in the string that are correct and in the correct position).
 def score(chars, target, target_score):
     score = 0
@@ -42,6 +51,7 @@ def score(chars, target, target_score):
         if chars[i] == target[i]:
             score += 1
     return score
+
 
 # 5. If any of the new strings has a perfect score (target length), halt. Otherwise, take the highest scoring string, and go to step 2.
 def match_target(target, target_score):
@@ -67,6 +77,7 @@ def match_target(target, target_score):
         mutated_target.append(new_chars)
         loop_index += 1
     return render_template('index.html', output='<br>'.join(mutated_target), index=loop_index)
+
 
 if __name__ == '__main__':
   app.run(debug=True)
