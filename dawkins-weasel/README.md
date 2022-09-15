@@ -4,13 +4,20 @@
 
 ## Project set up
 
-In project root:
-`python -m flask run`
+**In project root:**
+```
+python3 -m venv .venv
+python -m pip install flask
+source .venv/bin/activate
+python -m flask run
+```
 
-Go to:
+**Go to:**
+
 http://127.0.0.1:5000/
 
-Input a string to test how many iterations it takes to match the string.
+__Input a string to test how many iterations it takes to match the string.__
 
-To run test:
+**To run test:**
+
 `python -m unittest discover -p test_app.py`
