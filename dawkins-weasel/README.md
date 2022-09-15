@@ -11,3 +11,6 @@ Go to:
 http://127.0.0.1:5000/
 
 Input a string to test how many iterations it takes to match the string.
+
+To run test:
+`python -m unittest discover -p test_app.py`
