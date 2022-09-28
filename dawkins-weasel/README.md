@@ -7,8 +7,8 @@
 **In project root:**
 ```
 python3 -m venv .venv
-python -m pip install flask
 source .venv/bin/activate
+python -m pip install flask
 python -m flask run
 ```
 
