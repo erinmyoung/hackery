@@ -1,23 +1,11 @@
 from flask import Flask, render_template
-import pyttsx3
 from datetime import datetime
 
 app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template('index.html')
-
-@app.route("/talking_clock")
-def talking_clock():
-    running = True
-    message = get_message()
-    engine = pyttsx3.init()
-    while running and message:
-        engine.say(message)
-        engine.runAndWait()
-    running = False
-    return ("nothing")
+    return render_template('index.html', message=get_message())
 
 ones = {
     1: 'one',

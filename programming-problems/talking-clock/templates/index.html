@@ -2,26 +2,17 @@
 <html>
   <head>
     <title>Talking Clock</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/articulate.min.js') }}"></script>
   </head>
   <body>
     <div class="page_content">
-      <form>
-        <a href="#" id="talking-clock">Hear the time</a>
-      </form>
+      {% if message %}
+        <button onclick="$('.message').articulate('speak')" id="talking-clock">Hear the time</button>
+        <h3>Current time:</h3>
+        <p class="message">{{ message }}</p>
+      {% endif %}
     </div>
-
-    <script type=text/javascript>
-      $(function() {
-        $('a#talking-clock').on('click', function(e) {
-          e.preventDefault()
-          $.getJSON('/talking_clock',
-              function(data) {
-            //do nothing
-          });
-          return false;
-        });
-      });
-    </script>
   </body>
 </html>

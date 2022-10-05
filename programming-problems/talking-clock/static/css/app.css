@@ -1,0 +1,34 @@
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: black;
+  height: 100vh;
+  font-size: 20px;
+}
+
+.page_content {
+  display: grid;
+  min-width: 400px;
+  margin: auto;
+  row-gap: 8px;
+  text-align: center;
+}
+
+#talking-clock {
+  background-color: #009999;
+  padding: 12px 42px;
+  color: white;
+  text-decoration: none;
+  border: none;
+  font-size: 20px;
+}
+
+#talking-clock:hover {
+  background-color: #008080;
+  cursor: pointer;
+  transition: 0.5s;
+}
