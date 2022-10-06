@@ -5,7 +5,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template('index.html', message=get_message())
+    hour = datetime.now().hour
+    minute = datetime.now().minute
+    return render_template('index.html', message=get_message(hour, minute))
 
 ones = {
     1: 'one',
@@ -51,40 +53,42 @@ after_noon = {
     00: 'twelve'
 }
 
-def add_word(time, clock_message, is_minute = False):
+def add_word(time, message, is_minute = False):
+    """
+    1. Minute at the beginning of an hour (00) will not be applied
+    2. If there's only one minute, append with 'oh'
+    3. If there are two digits in the minute, check the tens first, then the ones
+    """
     if is_minute:
         if time == 00:
             pass
         elif len(str(time)) == 1:
-            clock_message.append('oh')
+            message.append('oh')
     if time in ones.keys():
-        clock_message.append(ones[time])
+        message.append(ones[time])
     elif len(str(time)) == 2:
         num_1 = int(str(time)[:1])
         num_2 = int(str(time)[1:2])
         if num_1 in tens.keys():
-            clock_message.append(tens[num_1])
+            message.append(tens[num_1])
         if num_2 in ones.keys():
-            clock_message.append(ones[num_2])
-    return clock_message
+            message.append(ones[num_2])
+    return message
 
-def get_message():
-    clock_message = ['It\'s']
-    hour = datetime.now().hour
-    minute = datetime.now().minute
-
-    # Determine message if hour is past noon or before
+def get_message(hour, minute):
+    """
+    1. Determine if the hour is past noon or before and then append word accordingly
+    2. Determine if the time is morning (am) or afternoon/evening (pm)
+    3. Combine all strings to the final clock message
+    """
+    message = ['It\'s']
     if hour > 12 or hour == 00:
         if hour in after_noon.keys():
-            clock_message.append(after_noon[hour])
-        add_word(minute, clock_message, True)
+            message.append(after_noon[hour])
+        add_word(minute, message, True)
     else:
-        add_word(hour, clock_message)
-        add_word(minute, clock_message, True)
+        add_word(hour, message)
+        add_word(minute, message, True)
+    message.append('pm') if hour > 12 else message.append('am')
 
-    # Determine if time is am or pm
-    clock_message.append('pm') if hour > 12 else clock_message.append('am')
-
-    # Combine list strings to sentence
-    talking_clock = ' '.join(clock_message)
-    return talking_clock
+    return ' '.join(message)
