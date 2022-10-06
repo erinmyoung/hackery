@@ -8,7 +8,7 @@
 ```
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install flask
+python -m pip install flask (only at set up)
 python -m flask run
 ```
 
