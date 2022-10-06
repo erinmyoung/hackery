@@ -56,8 +56,8 @@ after_noon = {
 def add_word(time, message, is_minute = False):
     """
     1. Minute at the beginning of an hour (00) will not be applied
-    2. If there's only one minute, append with 'oh'
-    3. If there are two digits in the minute, check the tens first, then the ones
+    2. If there's only one digit in the time, add 'oh'
+    3. If there are two digits in the time, check the tens first, then the ones
     """
     if is_minute:
         if time == 00:
