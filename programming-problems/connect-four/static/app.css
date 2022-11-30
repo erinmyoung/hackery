@@ -1,0 +1,25 @@
+body {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: black;
+  height: 100vh;
+}
+
+.page_content {
+  padding: 20px 40px;
+}
+
+form, .player_details {
+  min-width: 300px;
+  display: grid;
+  padding: 20px 0;
+}
+
+button {
+  background-color: purple;
+  color: white;
+  padding: 8px;
+  border-radius: 6px;
+}

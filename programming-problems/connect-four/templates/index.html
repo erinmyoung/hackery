@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Connect Four</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    <script src="{{url_for('static', filename='connect-four.js')}}"></script>
+  </head>
+  <body>
+    <div class="page_content">
+      {% if not color %}
+        <form method="POST">
+          <label for="player_name">Name:</label>
+          <input id="player_name" name="player_name">
+
+          <label for="colors">Pick your piece colour</label>
+          <select id="colors" name="colors">
+            <option value="#cc0000">Red</option>
+            <option value="#ffc34d">Yellow</option>
+          </select>
+          <input type="submit">
+        </form>
+      {% else %}
+        {% set player_id = 'one' if name else 'two' %}
+        <div class="player_details">
+          <p>Current player: {{ name|default('Computer') }}</p>
+          <p>Color: {{ color }}</p>
+          <canvas id="game_canvas_{{ player_id }}" width="50" height="50" style="color: {{ color }};"></canvas>
+        </div>
+      {% endif %}
+
+      {% set columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g'] %}
+      <div class="connect_four">
+        <table class="board">
+          <thead>
+            <tr>
+              {% for n in range(7) %}
+                <th><button data-index="{{ n }}" data-column="{{ columns[n] }}">Drop piece here</button></th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for n in range(6) %}
+              <tr data-index="{{ n }}">
+                {% for c in columns %}
+                  <td data-column="{{ c }}"><canvas class="empty_canvas" width="50" height="50" style="color: #efeff5;"></canvas></td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        new ConnectFour();
+      });
+    </script>
+  </body>
+</html>
