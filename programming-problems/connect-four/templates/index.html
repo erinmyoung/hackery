@@ -12,43 +12,50 @@
           <label for="player_name">Name:</label>
           <input id="player_name" name="player_name">
 
-          <label for="colors">Pick your piece colour</label>
+          <label for="colors">Pick your colour:</label>
           <select id="colors" name="colors">
+            <option disabled selected value> -- select colour -- </option>
             <option value="#cc0000">Red</option>
             <option value="#ffc34d">Yellow</option>
           </select>
-          <input type="submit">
+          <input type="submit" value="Start the game">
         </form>
       {% else %}
-        {% set player_id = 'one' if name else 'two' %}
-        <div class="player_details">
-          <p>Current player: {{ name|default('Computer') }}</p>
-          <p>Color: {{ color }}</p>
-          <canvas id="game_canvas_{{ player_id }}" width="50" height="50" style="color: {{ color }};"></canvas>
+        <div class="players">
+          <div id="player_1" class="player_details" data-color="{{ color }}">
+            <p class="name">Name: {{ name }}</p>
+            <p>Color: {{ color }}</p>
+            <canvas id="game_canvas_one" width="50" height="50" style="color: {{ color }};"></canvas>
+          </div>
+          <div id="player_2" class="player_details">
+            <p class="name">Name: Computer</p>
+            <p class="computer_color"></p>
+            <canvas id="game_canvas_two" width="50" height="50"></canvas>
+          </div>
         </div>
-      {% endif %}
 
-      {% set columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g'] %}
-      <div class="connect_four">
-        <table class="board">
-          <thead>
-            <tr>
-              {% for n in range(7) %}
-                <th><button data-index="{{ n }}" data-column="{{ columns[n] }}">Drop piece here</button></th>
-              {% endfor %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for n in range(6) %}
-              <tr data-index="{{ n }}">
-                {% for c in columns %}
-                  <td data-column="{{ c }}"><canvas class="empty_canvas" width="50" height="50" style="color: #efeff5;"></canvas></td>
+        {% set columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g'] %}
+        <div class="connect_four">
+          <table class="board">
+            <thead>
+              <tr>
+                {% for n in range(7) %}
+                  <th><button data-index="{{ n }}" data-column="{{ columns[n] }}">Drop piece here</button></th>
                 {% endfor %}
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {% for n in range(6) %}
+                <tr data-index="{{ n }}">
+                  {% for c in columns %}
+                    <td data-column="{{ c }}"><canvas class="empty_canvas" width="50" height="50" style="color: #efeff5;"></canvas></td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
     </div>
 
     <script>
