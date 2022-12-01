@@ -9,20 +9,29 @@ class ConnectFour {
     // Players
     this.playerOne = document.getElementById('player_1');
     this.playerTwo = document.getElementById('player_2');
+    this.currentPlayer = this.playerOne;
+    this.playerOne.dataset.playing = true;
+    this.playerTwo.dataset.playing = false;
 
     // Canvas
-    this.canvasOne = document.getElementById('game_canvas_one');
-    this.canvasTwo = document.getElementById('game_canvas_two');
+    this.playerOneCanvas = this.playerOne.querySelector('.player_1');
+    this.playerTwoCanvas = this.playerTwo.querySelector('.player_2');
     this.emptyCanvas = document.querySelectorAll('.empty_canvas');
+
+    // Misc
+    this.playerOneMoves = 0;
+    this.playerTwoMoves = 0;
+    this.columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+    this.height = 6;
 
     this.run();
   }
 
   run() {
     this.setComputerColor();
-    this.playerPiece(this.canvasOne);
-    this.playerPiece(this.canvasTwo);
-    this.currentPlayer(this.playerOne);
+    this.playerPiece(this.playerOneCanvas);
+    this.playerPiece(this.playerTwoCanvas);
+
     this.emptyCanvas.forEach((canvas) => this.playerPiece(canvas));
     this.buttons.forEach((button) => {
       button.addEventListener('click', this.movePiece.bind(this));
@@ -32,18 +41,22 @@ class ConnectFour {
   setComputerColor() {
     const playerOne = document.querySelector('.player_details[data-color]');
     if (playerOne.dataset.color === '#cc0000') {
-      this.canvasTwo.style.color = '#ffc34d';
+      this.playerTwoCanvas.style.color = '#ffc34d';
       document.querySelector('.computer_color').innerHTML = 'Color: #ffc34d';
     } else {
-      this.canvasTwo.style.color = '#cc0000';
+      this.playerTwoCanvas.style.color = '#cc0000';
       document.querySelector('.computer_color').innerHTML = 'Color: #cc0000';
     }
   }
 
   movePiece(e) {
     e.preventDefault();
+    if (this.currentPlayer === this.playerOne) this.playerOneMoves++;
+    else this.playerTwoMoves++;
+
     const column = e.target.dataset.column;
     this.insertPiece(column);
+    this.switchPlayer();
   }
 
   insertPiece(column) {
@@ -51,23 +64,56 @@ class ConnectFour {
     for (let i = 0; i < reversed.length; i++) {
       const el = reversed[i].querySelector(`td[data-column=${column}]`);
       const canvas = el.querySelector('canvas');
-      const cloned = this.canvasOne.cloneNode();
-      cloned.id += 1
+      const playerCanvas = this.currentPlayer.querySelector('canvas');
+      const cloned = playerCanvas.cloneNode();
       this.playerPiece(cloned);
-      console.log(cloned);
       if (canvas.classList.contains('empty_canvas')) {
         el.replaceChild(cloned, canvas);
+        let count;
+        if (cloned.classList.contains('player_1')) count = this.playerOneMoves;
+        else count = this.playerTwoMoves;
+        cloned.dataset.moveCount = count;
+        this.collectMoves(this.currentPlayer);
         break;
       }
     }
   }
 
-  currentPlayer(player) {
-    const message = document.createElement('span');
-    const child = player.querySelector('.name');
-    message.innerHTML = 'Current player';
-    message.style.color = 'green';
-    player.insertBefore(message, child);
+  collectMoves(player) {
+    const matches = [];
+    const pieces = this.board.querySelectorAll(`.${player.id}`);
+    for (let i = 0; i < pieces.length; i++) {
+      const column = pieces[i].closest('td').dataset.column;
+      const row = pieces[i].closest('tr').dataset.index;
+      matches.push({key: column, value: row});
+
+      while (pieces[i].dataset.moveCount >= 4) {
+        this.checkWin(pieces[i]);
+        break;
+      }
+    }
+  }
+
+  checkWin(piece) {
+    
+  }
+
+  getNextItem(column) {
+    const currentIndex = this.columns.indexOf(column);
+    const nextIndex = (currentIndex + 1) % this.columns.length;
+    return this.columns[nextIndex];
+  }
+
+  switchPlayer() {
+    if (this.currentPlayer === this.playerOne) {
+      this.currentPlayer = this.playerTwo;
+      this.playerOne.dataset.playing = false;
+    }
+    else {
+      this.currentPlayer = this.playerOne;
+      this.playerTwo.dataset.playing = false;
+    }
+    this.currentPlayer.dataset.playing = true;
   }
 
   playerPiece(canvas) {
