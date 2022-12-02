@@ -95,6 +95,7 @@ class ConnectFour {
   }
 
   collectMoves(player) {
+    let moves = [];
     const pieces = this.board.querySelectorAll(`.${player.id}`);
     for (let i = 0; i < pieces.length; i++) {
       const column = pieces[i].closest('td').dataset.column;
@@ -106,12 +107,12 @@ class ConnectFour {
       else index = 2;
 
       this.matches[row][columnIndex] = index;
-      this.checkWin(player);
+      this.checkWin(player, moves);
     }
   }
 
-  checkWin(player) {
-    if (this.isVerticalWin() || this.isHorizontalWin() || this.isDiagonalWin()) {
+  checkWin(player, moves) {
+    if (this.isVerticalWin() || this.isHorizontalWin()) {
       this.buttons.forEach((button) => {
         button.removeEventListener('click', this.movePiece.bind(this));
         button.disabled = true;
@@ -119,7 +120,7 @@ class ConnectFour {
 
       this.winningMessage.classList.remove('hide');
       this.winningMessage.classList.add('show');
-      this.winMessage(player);
+      this.winMessage(player, moves);
 
       this.playAgain.addEventListener('click', () => location.reload());
       return;
@@ -136,13 +137,15 @@ class ConnectFour {
     }
   }
 
-  winMessage(player) {
+  winMessage(player, moves) {
     const totalMoves = this.board.querySelectorAll(`.${player.id}`).length;
     const winner = this.winningMessage.querySelector('span.winner');
     const moveCount = this.winningMessage.querySelector('span.move_count');
-    // const moveList = this.winningMessage.querySelector('span.move_list');
+    const moveList = this.winningMessage.querySelector('span.move_list');
+
     winner.innerHTML = this.currentPlayer.dataset.name;
     moveCount.innerHTML = totalMoves;
+    moveList.innerHTML = moves;
   }
 
   isADraw() {
@@ -160,14 +163,21 @@ class ConnectFour {
     let current;
     let prev = 0;
     let tally = 0;
+    let winningMoves = [];
 
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
         current = this.matches[y][x];
-        if (current === prev && current !== 0) tally += 1;
+        if (current === prev && current !== 0) {
+          tally += 1;
+          winningMoves.push([`${y}${this.columns[x]}`]);
+        }
         else tally = 0;
 
-        if (tally === this.winCount - 1) return true;
+        if (tally === this.winCount - 1) {
+          console.log(winningMoves);
+          return true;
+        }
         prev = current;
       }
 
