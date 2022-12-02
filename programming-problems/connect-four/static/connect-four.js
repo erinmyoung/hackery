@@ -6,6 +6,10 @@ class ConnectFour {
     this.board = this.table.querySelector('.board');
     this.rows = this.board.querySelectorAll('tr[data-index]');
 
+    // Winner elements
+    this.winningMessage = document.querySelector('.winning_wrapper');
+    this.playAgain = document.getElementById('play_again');
+
     // Players
     this.playerOne = document.getElementById('player_1');
     this.playerTwo = document.getElementById('player_2');
@@ -23,6 +27,17 @@ class ConnectFour {
     this.playerTwoMoves = 0;
     this.columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
     this.height = 6;
+    this.width = 7;
+    this.winCount = 4;
+    this.matches = [
+      [0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0]
+    ];
+    this.winningMoves = []
 
     this.run();
   }
@@ -80,28 +95,204 @@ class ConnectFour {
   }
 
   collectMoves(player) {
-    const matches = [];
     const pieces = this.board.querySelectorAll(`.${player.id}`);
     for (let i = 0; i < pieces.length; i++) {
       const column = pieces[i].closest('td').dataset.column;
       const row = pieces[i].closest('tr').dataset.index;
-      matches.push({key: column, value: row});
+      const columnIndex = this.columns.indexOf(column);
+      let index;
 
-      while (pieces[i].dataset.moveCount >= 4) {
-        this.checkWin(pieces[i]);
-        break;
-      }
+      if (this.currentPlayer === this.playerOne) index = 1;
+      else index = 2;
+
+      this.matches[row][columnIndex] = index;
+      this.checkWin(player);
     }
   }
 
-  checkWin(piece) {
-    
+  checkWin(player) {
+    if (this.isVerticalWin() || this.isHorizontalWin() || this.isDiagonalWin()) {
+      this.buttons.forEach((button) => {
+        button.removeEventListener('click', this.movePiece.bind(this));
+        button.disabled = true;
+      });
+
+      this.winningMessage.classList.remove('hide');
+      this.winningMessage.classList.add('show');
+      this.winMessage(player);
+
+      this.playAgain.addEventListener('click', () => location.reload());
+      return;
+    } else if (this.isADraw()) {
+      this.buttons.forEach((button) => {
+        button.removeEventListener('click', this.movePiece.bind(this));
+        button.disabled = true;
+      });
+
+      // this.winningMessage.classList.remove('hide');
+      // this.winningMessage.classList.add('show');
+      this.playAgain.addEventListener('click', () => location.reload());
+      return;
+    }
   }
 
-  getNextItem(column) {
-    const currentIndex = this.columns.indexOf(column);
-    const nextIndex = (currentIndex + 1) % this.columns.length;
-    return this.columns[nextIndex];
+  winMessage(player) {
+    const totalMoves = this.board.querySelectorAll(`.${player.id}`).length;
+    const winner = this.winningMessage.querySelector('span.winner');
+    const moveCount = this.winningMessage.querySelector('span.move_count');
+    // const moveList = this.winningMessage.querySelector('span.move_list');
+    winner.innerHTML = this.currentPlayer.dataset.name;
+    moveCount.innerHTML = totalMoves;
+  }
+
+  isADraw() {
+    for (var y = 0; y <= this.height; y++) {
+      for (var x = 0; x <= this.width; x++) {
+        if (!this.matches[y][x] !== 0) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  isHorizontalWin() {
+    let current;
+    let prev = 0;
+    let tally = 0;
+
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        current = this.matches[y][x];
+        if (current === prev && current !== 0) tally += 1;
+        else tally = 0;
+
+        if (tally === this.winCount - 1) return true;
+        prev = current;
+      }
+
+      // Reset
+      tally = 0;
+      prev = 0;
+    }
+    return false;
+  }
+
+  isVerticalWin() {
+    let current;
+    let prev = 0;
+    let tally = 0;
+
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        current = this.matches[y][x];
+        if (current === prev && current !== 0) tally += 1;
+        else tally = 0;
+
+        if (tally === this.winCount - 1) return true;
+        prev = current;
+      }
+      // Reset
+      tally = 0;
+      prev = 0;
+    }
+    return false;
+  }
+
+  isDiagonalWin() {
+    let xtemp = 0;
+    let ytemp = 0;
+    let current = 0;
+    let prev = 0;
+    let tally = 0;
+
+    // Test for down-right diagonals across the top.
+    for (let x = 0; x < this.width; x++) {
+      xtemp = x;
+      ytemp = 0;
+
+      while (xtemp <= this.width && ytemp <= this.height) {
+        current = this.matches[ytemp][xtemp];
+        if (current && current === prev && current !== 0) tally += 1;
+        else tally = 0;
+
+        if (tally === this.winCount - 1) return true;
+        prev = current;
+
+        // Shift down-right one diagonal index.
+        xtemp++;
+        ytemp++;
+      }
+      // Reset
+      tally = 0;
+      prev = 0;
+    }
+
+    // Test for down-left diagonals across the top.
+    for (let x = 0; x <= this.width; x++) {
+      xtemp = x;
+      ytemp = 0;
+
+      while (0 <= xtemp && ytemp <= this.height) {
+        current = this.matches[ytemp][xtemp];
+        if (current === prev && current !== 0) tally += 1;
+        else tally = 0;
+
+        if (tally === this.winCount - 1) return true;
+        prev = current;
+
+        // Shift down-left one diagonal index.
+        xtemp--;
+        ytemp++;
+      }
+      // Reset
+      tally = 0;
+      prev = 0;
+    }
+
+    // Test for down-right diagonals down the left side.
+    for (let y = 0; y < this.height; y++) {
+      xtemp = 0;
+      ytemp = y;
+
+      while (xtemp <= this.width && ytemp <= this.height) {
+        current = this.matches[ytemp][xtemp];
+        if (current === prev && current !== 0) tally += 1;
+        else tally = 0;
+
+        if (tally === this.winCount - 1) return true;
+        prev = current;
+
+        // Shift down-right one diagonal index.
+        xtemp++;
+        ytemp++;
+      }
+      // Reset
+      tally = 0;
+      prev = 0;
+    }
+
+    // Test for down-left diagonals down the right side.
+    for (let y = 0; y < this.height; y++) {
+      xtemp = this.width;
+      ytemp = y;
+
+      while (0 <= xtemp && ytemp <= this.height) {
+        current = this.matches[ytemp][xtemp];
+        if (current === prev && current !== 0) tally += 1;
+        else tally = 0;
+        if (tally === this.winCount - 1) return true;
+        prev = current;
+
+        // Shift down-left one diagonal index.
+        xtemp--;
+        ytemp++;
+      }
+      // Reset
+      tally = 0;
+      prev = 0;
+    }
+    return false;
   }
 
   switchPlayer() {

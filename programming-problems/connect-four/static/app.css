@@ -38,6 +38,24 @@ input[type=submit] {
   font-size: 1rem;
 }
 
+.winning_wrapper.hide {
+  display: none;
+}
+
+.winning_wrapper.show {
+  display: block;
+}
+
+button#play_again {
+  width: 50%;
+  margin: 16px auto;
+}
+
+button:disabled {
+  cursor: text;
+  background-color: #a2a2c3;
+}
+
 .players {
   display: flex;
   justify-content: space-between;

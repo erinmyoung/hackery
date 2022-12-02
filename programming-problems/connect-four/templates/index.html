@@ -21,13 +21,18 @@
           <input type="submit" value="Start the game">
         </form>
       {% else %}
+        <div class="winning_wrapper hide">
+          <p>The winner is: <span class="winner"></span></p>
+          <p>They won at move <span class="move_count"></span> with (<span class="move_list"></span>)</p>
+          <button id="play_again">Play again</button>
+        </div>
         <div class="players">
-          <div id="player_1" class="player_details" data-color="{{ color }}">
+          <div id="player_1" class="player_details" data-color="{{ color }}" data-name="{{ name }}">
             <p class="name">Name: {{ name }}</p>
             <p>Color: {{ color }}</p>
             <canvas class="player_1" width="50" height="50" style="color: {{ color }};"></canvas>
           </div>
-          <div id="player_2" class="player_details">
+          <div id="player_2" class="player_details" data-name="computer">
             <p class="name">Name: Computer</p>
             <p class="computer_color"></p>
             <canvas class="player_2" width="50" height="50"></canvas>
