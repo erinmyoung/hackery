@@ -95,7 +95,6 @@ class ConnectFour {
   }
 
   collectMoves(player) {
-    let moves = [];
     const pieces = this.board.querySelectorAll(`.${player.id}`);
     for (let i = 0; i < pieces.length; i++) {
       const column = pieces[i].closest('td').dataset.column;
@@ -107,12 +106,12 @@ class ConnectFour {
       else index = 2;
 
       this.matches[row][columnIndex] = index;
-      this.checkWin(player, moves);
+      this.checkWinningMoves(player);
     }
   }
 
-  checkWin(player, moves) {
-    if (this.isVerticalWin() || this.isHorizontalWin()) {
+  checkWinningMoves(player) {
+    if (this.isVerticalWin() || this.isHorizontalWin() || this.isDiagonalWin()) {
       this.buttons.forEach((button) => {
         button.removeEventListener('click', this.movePiece.bind(this));
         button.disabled = true;
@@ -120,7 +119,7 @@ class ConnectFour {
 
       this.winningMessage.classList.remove('hide');
       this.winningMessage.classList.add('show');
-      this.winMessage(player, moves);
+      this.winMessage(player);
 
       this.playAgain.addEventListener('click', () => location.reload());
       return;
@@ -129,15 +128,12 @@ class ConnectFour {
         button.removeEventListener('click', this.movePiece.bind(this));
         button.disabled = true;
       });
-
-      // this.winningMessage.classList.remove('hide');
-      // this.winningMessage.classList.add('show');
       this.playAgain.addEventListener('click', () => location.reload());
       return;
     }
   }
 
-  winMessage(player, moves) {
+  winMessage(player) {
     const totalMoves = this.board.querySelectorAll(`.${player.id}`).length;
     const winner = this.winningMessage.querySelector('span.winner');
     const moveCount = this.winningMessage.querySelector('span.move_count');
@@ -145,7 +141,7 @@ class ConnectFour {
 
     winner.innerHTML = this.currentPlayer.dataset.name;
     moveCount.innerHTML = totalMoves;
-    moveList.innerHTML = moves;
+    moveList.innerHTML = this.winningMoves;
   }
 
   isADraw() {
@@ -163,21 +159,14 @@ class ConnectFour {
     let current;
     let prev = 0;
     let tally = 0;
-    let winningMoves = [];
 
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
         current = this.matches[y][x];
-        if (current === prev && current !== 0) {
-          tally += 1;
-          winningMoves.push([`${y}${this.columns[x]}`]);
-        }
+        if (current === prev && current !== 0) tally += 1;
         else tally = 0;
 
-        if (tally === this.winCount - 1) {
-          console.log(winningMoves);
-          return true;
-        }
+        if (tally === this.winCount - 1) return true;
         prev = current;
       }
 
@@ -210,28 +199,30 @@ class ConnectFour {
   }
 
   isDiagonalWin() {
-    let xtemp = 0;
-    let ytemp = 0;
+    let posX = 0;
+    let posY = 0;
     let current = 0;
     let prev = 0;
     let tally = 0;
+    let height = this.height - 1;
+    let width = this.width - 1;
 
     // Test for down-right diagonals across the top.
-    for (let x = 0; x < this.width; x++) {
-      xtemp = x;
-      ytemp = 0;
+    for (let x = 0; x < width; x++) {
+      posX = x;
+      posY = 0;
 
-      while (xtemp <= this.width && ytemp <= this.height) {
-        current = this.matches[ytemp][xtemp];
-        if (current && current === prev && current !== 0) tally += 1;
+      while (posX <= width && posY <= height) {
+        current = this.matches[posY][posX];
+        if (current === prev && current !== 0) tally += 1;
         else tally = 0;
 
         if (tally === this.winCount - 1) return true;
         prev = current;
 
         // Shift down-right one diagonal index.
-        xtemp++;
-        ytemp++;
+        posX++;
+        posY++;
       }
       // Reset
       tally = 0;
@@ -239,12 +230,12 @@ class ConnectFour {
     }
 
     // Test for down-left diagonals across the top.
-    for (let x = 0; x <= this.width; x++) {
-      xtemp = x;
-      ytemp = 0;
+    for (let x = 0; x <= width; x++) {
+      posX = x;
+      posY = 0;
 
-      while (0 <= xtemp && ytemp <= this.height) {
-        current = this.matches[ytemp][xtemp];
+      while (0 <= posX && posY <= height) {
+        current = this.matches[posY][posX];
         if (current === prev && current !== 0) tally += 1;
         else tally = 0;
 
@@ -252,8 +243,8 @@ class ConnectFour {
         prev = current;
 
         // Shift down-left one diagonal index.
-        xtemp--;
-        ytemp++;
+        posX--;
+        posY++;
       }
       // Reset
       tally = 0;
@@ -261,12 +252,12 @@ class ConnectFour {
     }
 
     // Test for down-right diagonals down the left side.
-    for (let y = 0; y < this.height; y++) {
-      xtemp = 0;
-      ytemp = y;
+    for (let y = 0; y < height; y++) {
+      posX = 0;
+      posY = y;
 
-      while (xtemp <= this.width && ytemp <= this.height) {
-        current = this.matches[ytemp][xtemp];
+      while (posX <= width && posY <= height) {
+        current = this.matches[posY][posX];
         if (current === prev && current !== 0) tally += 1;
         else tally = 0;
 
@@ -274,8 +265,8 @@ class ConnectFour {
         prev = current;
 
         // Shift down-right one diagonal index.
-        xtemp++;
-        ytemp++;
+        posX++;
+        posY++;
       }
       // Reset
       tally = 0;
@@ -283,20 +274,20 @@ class ConnectFour {
     }
 
     // Test for down-left diagonals down the right side.
-    for (let y = 0; y < this.height; y++) {
-      xtemp = this.width;
-      ytemp = y;
+    for (let y = 0; y < height; y++) {
+      posX = width;
+      posY = y;
 
-      while (0 <= xtemp && ytemp <= this.height) {
-        current = this.matches[ytemp][xtemp];
+      while (0 <= posX && posY <= height) {
+        current = this.matches[posY][posX];
         if (current === prev && current !== 0) tally += 1;
         else tally = 0;
         if (tally === this.winCount - 1) return true;
         prev = current;
 
         // Shift down-left one diagonal index.
-        xtemp--;
-        ytemp++;
+        posX--;
+        posY++;
       }
       // Reset
       tally = 0;
